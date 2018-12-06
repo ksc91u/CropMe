@@ -13,10 +13,10 @@ interface ScaleAnimator {
      *
      * @param scale how much image scales
      **/
-    void scale(float scale);
+    ScaleXY scale(float scale);
 
     /**
      * rescale image when image is too much big or small
      **/
-    void reScaleIfNeeded();
+    ScaleXY reScaleIfNeeded();
 }
