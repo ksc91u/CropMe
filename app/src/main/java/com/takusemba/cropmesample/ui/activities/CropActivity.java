@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 
 import com.takusemba.cropme.CropView;
 import com.takusemba.cropme.OnCropListener;
+import com.takusemba.cropme.ScaleXY;
 import com.takusemba.cropmesample.R;
 import com.takusemba.cropmesample.clients.AlbumClient;
 import com.takusemba.cropmesample.clients.ImageClient;
@@ -57,7 +58,7 @@ public class CropActivity extends AppCompatActivity {
         OnPhotoClickListener listener = new OnPhotoClickListener() {
             @Override
             public void onPhotoClicked(Photo photo) {
-                cropView.setUri(photo.uri);
+                cropView.setUri(photo.uri, new ScaleXY(2.0f, 2.0f));
             }
         };
         adapter = new AlbumAdapter(CropActivity.this, new ArrayList<Album>(), listener);
@@ -157,7 +158,7 @@ public class CropActivity extends AppCompatActivity {
                             if (!album.photos.isEmpty()) {
                                 if (adapter.getItemCount() == 0) {
                                     Photo photo = album.photos.get(0);
-                                    cropView.setUri(photo.uri);
+                                    cropView.setUri(photo.uri, new ScaleXY(1.0f, 1.0f));
                                 }
                                 adapter.addItem(album);
                             }

@@ -102,11 +102,11 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         actionDetector = ActionDetector(context, object : ActionListener {
 
             override fun onScaled(scale: Float) {
-                scaleAnimator!!.scale(scale)
+                val result = scaleAnimator!!.scale(scale)
             }
 
             override fun onScaleEnded() {
-                scaleAnimator!!.reScaleIfNeeded()
+                val result = scaleAnimator!!.reScaleIfNeeded()
             }
 
             override fun onMoved(dx: Float, dy: Float) {
@@ -152,9 +152,14 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     override fun setUri(uri: Uri) {
+        setUri(uri, ScaleXY(1.0f, 1.0f))
+    }
+
+    override fun setUri(uri: Uri, scale: ScaleXY) {
         val image = findViewById<ImageView>(R.id.cropme_image_view)
         image.setImageURI(uri)
         image.requestLayout()
+        scaleAnimator?.scale(scale.x)
     }
 
     override fun setBitmap(bitmap: Bitmap) {
