@@ -71,7 +71,7 @@ class HorizontalMoveAnimatorImpl implements MoveAnimator {
     }
 
     @Override
-    public void move(float delta) {
+    public Float move(float delta) {
         View target = (View) animator.getTarget();
         if (target != null) {
             cancel();
@@ -79,11 +79,13 @@ class HorizontalMoveAnimatorImpl implements MoveAnimator {
             animator.setDuration(0);
             animator.setFloatValues(target.getTranslationX() + delta);
             animator.start();
+            return target.getTranslationX() + delta;
         }
+        return target.getTranslationX();
     }
 
     @Override
-    public void reMoveIfNeeded(float velocity) {
+    public Float reMoveIfNeeded(float velocity) {
         View target = (View) animator.getTarget();
         if (target != null) {
             Rect targetRect = new Rect();
@@ -110,11 +112,14 @@ class HorizontalMoveAnimatorImpl implements MoveAnimator {
             if (restrictionRect.left < afterRect.left) {
                 cancel();
                 spring.setStartVelocity(velocity).animateToFinalPosition(restrictionRect.left + horizontalDiff);
+                return restrictionRect.left + horizontalDiff;
             } else if (afterRect.right < restrictionRect.right) {
                 cancel();
                 spring.setStartVelocity(velocity).animateToFinalPosition(restrictionRect.right - target.getWidth() - horizontalDiff);
+                return restrictionRect.right - target.getWidth() - horizontalDiff;
             }
         }
+        return target.getTranslationX();
     }
 
     @Override

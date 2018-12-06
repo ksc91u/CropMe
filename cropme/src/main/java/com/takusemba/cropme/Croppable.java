@@ -16,7 +16,7 @@ interface Croppable {
      **/
     void setUri(Uri uri);
 
-    void setUri(Uri uri, ScaleXY scale);
+    void setUri(Uri uri, ScaleXY scale, Float offsetX, Float offsetY);
 
     /**
      * setBitmap to {@link CropImageView}

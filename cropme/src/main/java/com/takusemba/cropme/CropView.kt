@@ -110,8 +110,10 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             }
 
             override fun onMoved(dx: Float, dy: Float) {
-                horizontalAnimator!!.move(dx)
-                verticalAnimator!!.move(dy)
+                val x = horizontalAnimator!!.move(dx)
+                val y = verticalAnimator!!.move(dy)
+
+                println(">>>> move $x, $y")
             }
 
             override fun onFlinged(velocityX: Float, velocityY: Float) {
@@ -121,11 +123,13 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
             override fun onMoveEnded() {
                 if (horizontalAnimator!!.isNotFlinging) {
-                    horizontalAnimator!!.reMoveIfNeeded(0f)
+                    val x = horizontalAnimator!!.reMoveIfNeeded(0f)
+                    println(">>>> end $x")
                 }
 
                 if (verticalAnimator!!.isNotFlinging) {
-                    verticalAnimator!!.reMoveIfNeeded(0f)
+                    val y = verticalAnimator!!.reMoveIfNeeded(0f)
+                    println(">>>> end $y")
                 }
             }
         })
@@ -152,14 +156,16 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     override fun setUri(uri: Uri) {
-        setUri(uri, ScaleXY(1.0f, 1.0f))
+        setUri(uri, ScaleXY(1.0f, 1.0f), 0.0f, 0.0f)
     }
 
-    override fun setUri(uri: Uri, scale: ScaleXY) {
+    override fun setUri(uri: Uri, scale: ScaleXY, offsetX: Float, offsetY: Float) {
         val image = findViewById<ImageView>(R.id.cropme_image_view)
         image.setImageURI(uri)
         image.requestLayout()
         scaleAnimator?.scale(scale.x)
+        horizontalAnimator?.move(offsetX)
+        verticalAnimator?.move(offsetY)
     }
 
     override fun setBitmap(bitmap: Bitmap) {

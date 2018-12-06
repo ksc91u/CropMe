@@ -30,14 +30,14 @@ interface MoveAnimator {
      *
      * @param delta distance of how much image moves
      **/
-    void move(float delta);
+    Float move(float delta);
 
     /**
      * bounce image when image is off of {@link CropOverlayView#resultRect}
      *
      * @param velocity velocity when starting to move
      **/
-    void reMoveIfNeeded(float velocity);
+    Float reMoveIfNeeded(float velocity);
 
     /**
      * fling image
