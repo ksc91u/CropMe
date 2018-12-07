@@ -1,17 +1,11 @@
 package com.takusemba.cropme
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.TypedArray
-import android.graphics.Bitmap
-import android.graphics.Rect
-import android.graphics.RectF
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
@@ -37,6 +31,12 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     private var restriction: RectF? = null
     private val backgroundAlpha: Int
     private val withBorder: Boolean
+
+    private var uri: Uri? = null
+    private var scale: ScaleXY? = null
+    private var point:PointF? = null
+
+    var onCropChangeListener: OnCropChangeListener? = null
 
     init {
         val a = getContext().obtainStyledAttributes(attrs, R.styleable.CropView)
@@ -102,18 +102,28 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         actionDetector = ActionDetector(context, object : ActionListener {
 
             override fun onScaled(scale: Float) {
-                val result = scaleAnimator!!.scale(scale)
+                this@CropView.scale = scaleAnimator!!.scale(scale)
+                uri?.let{
+                    onCropChangeListener?.onCropChange(it, this@CropView.scale, this@CropView.point)
+                }
             }
 
             override fun onScaleEnded() {
-                val result = scaleAnimator!!.reScaleIfNeeded()
+                this@CropView.scale = scaleAnimator!!.reScaleIfNeeded()
+                uri?.let{
+                    onCropChangeListener?.onCropChange(it, this@CropView.scale, this@CropView.point)
+                }
             }
 
             override fun onMoved(dx: Float, dy: Float) {
                 val x = horizontalAnimator!!.move(dx)
                 val y = verticalAnimator!!.move(dy)
 
-                println(">>>> move $x, $y")
+                this@CropView.point = PointF(x, y)
+                uri?.let{
+                    onCropChangeListener?.onCropChange(it, this@CropView.scale, this@CropView.point)
+                }
+
             }
 
             override fun onFlinged(velocityX: Float, velocityY: Float) {
@@ -124,12 +134,16 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             override fun onMoveEnded() {
                 if (horizontalAnimator!!.isNotFlinging) {
                     val x = horizontalAnimator!!.reMoveIfNeeded(0f)
-                    println(">>>> end $x")
+                    this@CropView.point = PointF(x, this@CropView.point?.y?:0f)
                 }
 
                 if (verticalAnimator!!.isNotFlinging) {
                     val y = verticalAnimator!!.reMoveIfNeeded(0f)
-                    println(">>>> end $y")
+                    this@CropView.point = PointF(this@CropView.point?.x?:0f, y)
+                }
+
+                uri?.let{
+                    onCropChangeListener?.onCropChange(it, this@CropView.scale, this@CropView.point)
                 }
             }
         })
@@ -166,6 +180,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         scaleAnimator?.scale(scale.x)
         horizontalAnimator?.move(offsetX)
         verticalAnimator?.move(offsetY)
+        this.uri = uri
     }
 
     override fun setBitmap(bitmap: Bitmap) {

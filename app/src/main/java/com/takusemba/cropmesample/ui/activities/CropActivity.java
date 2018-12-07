@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -19,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.takusemba.cropme.CropView;
+import com.takusemba.cropme.OnCropChangeListener;
 import com.takusemba.cropme.OnCropListener;
 import com.takusemba.cropme.ScaleXY;
 import com.takusemba.cropmesample.R;
@@ -61,6 +64,14 @@ public class CropActivity extends AppCompatActivity {
                 cropView.setUri(photo.uri, new ScaleXY(2.0f, 2.0f), 300, 300);
             }
         };
+
+//        cropView.setOnCropChangeListener(new OnCropChangeListener() {
+//            @Override
+//            public void onCropChange(Uri uri, ScaleXY scaleXY, PointF point) {
+//                System.out.println(">>>> " + uri + "," + scaleXY + "," + point);
+//            }
+//        });
+
         adapter = new AlbumAdapter(CropActivity.this, new ArrayList<Album>(), listener);
 
         backButton.setOnClickListener(new View.OnClickListener() {

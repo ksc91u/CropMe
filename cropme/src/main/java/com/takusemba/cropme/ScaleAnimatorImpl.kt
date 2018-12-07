@@ -53,8 +53,8 @@ internal class ScaleAnimatorImpl(target: View, private val maxScale: Int) : Scal
 
     override fun reScaleIfNeeded(): ScaleXY? {
         val targetX = animatorX.target as View
-        var scaleX:Float = 1.0f
-        var scaleY:Float = 1.0f
+        var scaleX:Float = targetX.scaleX
+        var scaleY:Float = targetX.scaleY
 
         if (targetX != null) {
             if (targetX.scaleX < 1) {
