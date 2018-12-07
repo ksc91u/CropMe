@@ -174,6 +174,9 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     override fun setUri(uri: Uri, scale: ScaleXY, offsetX: Float, offsetY: Float) {
+        scaleAnimator?.scale(1.0f)
+        horizontalAnimator?.move(0f)
+        verticalAnimator?.move(0f)
         val image = findViewById<ImageView>(R.id.cropme_image_view)
         image.setImageURI(uri)
         image.requestLayout()
