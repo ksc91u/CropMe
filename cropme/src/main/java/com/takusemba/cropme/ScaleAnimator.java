@@ -19,4 +19,6 @@ interface ScaleAnimator {
      * rescale image when image is too much big or small
      **/
     ScaleXY reScaleIfNeeded();
+
+    void reset();
 }

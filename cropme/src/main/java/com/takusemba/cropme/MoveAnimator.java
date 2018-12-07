@@ -51,4 +51,6 @@ interface MoveAnimator {
      **/
     boolean isNotFlinging();
 
+    void reset();
+
 }

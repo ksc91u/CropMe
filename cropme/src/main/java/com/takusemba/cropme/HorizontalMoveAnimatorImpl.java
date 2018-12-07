@@ -136,6 +136,19 @@ class HorizontalMoveAnimatorImpl implements MoveAnimator {
         return !isFlinging;
     }
 
+    @Override
+    public void reset() {
+        View target = (View) animator.getTarget();
+        if (target != null) {
+            cancel();
+            animator.setInterpolator(null);
+            animator.setDuration(0);
+            animator.setFloatValues(0 - target.getTranslationX());
+            animator.start();
+        }
+        reMoveIfNeeded(0);
+    }
+
     private void cancel() {
         animator.cancel();
         spring.cancel();

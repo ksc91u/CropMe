@@ -137,6 +137,19 @@ class VerticalMoveAnimatorImpl implements MoveAnimator {
         return !isFlinging;
     }
 
+    @Override
+    public void reset() {
+        View target = (View) animator.getTarget();
+        if (target != null) {
+            cancel();
+            animator.setInterpolator(null);
+            animator.setDuration(0);
+            animator.setFloatValues(0 - target.getTranslationY());
+            animator.start();
+        }
+        reMoveIfNeeded(0);
+    }
+
     private void cancel() {
         isFlinging = false;
         animator.cancel();

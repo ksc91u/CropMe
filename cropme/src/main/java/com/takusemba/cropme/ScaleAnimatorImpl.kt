@@ -29,6 +29,27 @@ internal class ScaleAnimatorImpl(target: View, private val maxScale: Int) : Scal
         animatorY.target = target
     }
 
+    override fun reset() {
+        val targetX = animatorX.target as View
+        if (targetX != null) {
+            animatorX.cancel()
+            animatorX.duration = 0
+            animatorX.interpolator = null
+            animatorX.setFloatValues(1 / targetX.scaleX)
+            animatorX.start()
+        }
+
+        val targetY = animatorY.target as View
+        if (targetY != null) {
+            animatorY.cancel()
+            animatorY.duration = 0
+            animatorY.interpolator = null
+            animatorY.setFloatValues(1 / targetY.scaleY)
+            animatorY.start()
+        }
+        reScaleIfNeeded()
+    }
+
     override fun scale(scale: Float): ScaleXY? {
         val targetX = animatorX.target as View
         if (targetX != null) {
