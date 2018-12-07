@@ -20,5 +20,5 @@ interface ScaleAnimator {
      **/
     ScaleXY reScaleIfNeeded();
 
-    void reset();
+    void scaleTo(float scale);
 }

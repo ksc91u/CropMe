@@ -177,16 +177,11 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         val image = findViewById<ImageView>(R.id.cropme_image_view)
         image.setImageURI(uri)
         image.requestLayout()
-
-        scaleAnimator?.reset()
-        horizontalAnimator?.reMoveIfNeeded(0f)
-        verticalAnimator?.reMoveIfNeeded(0f)
-
         image.postDelayed({
-            scaleAnimator?.scale(scale.x)
-            horizontalAnimator?.move(offsetX)
-            verticalAnimator?.move(offsetY)
-        }, 500)
+            scaleAnimator?.scaleTo(scale.x)
+            horizontalAnimator?.moveTo(offsetX)
+            verticalAnimator?.moveTo(offsetY)
+        }, 100)
         this.uri = uri
     }
 

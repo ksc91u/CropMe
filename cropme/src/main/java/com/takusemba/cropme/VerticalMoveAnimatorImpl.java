@@ -138,15 +138,17 @@ class VerticalMoveAnimatorImpl implements MoveAnimator {
     }
 
     @Override
-    public void reset() {
+    public void moveTo(float value) {
         View target = (View) animator.getTarget();
         if (target != null) {
-            cancel();
-            animator.setInterpolator(null);
-            animator.setDuration(0);
-            animator.setFloatValues(0 - target.getTranslationY());
-            animator.start();
+//            cancel();
+//            animator.setInterpolator(null);
+//            animator.setDuration(0);
+//            animator.setFloatValues(value - target.getTranslationY());
+//            animator.start();
+            target.setTranslationY(value);
         }
+
         reMoveIfNeeded(0);
     }
 
