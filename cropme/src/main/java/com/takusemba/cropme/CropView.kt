@@ -3,6 +3,7 @@ package com.takusemba.cropme
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.AttributeSet
 import android.view.Gravity
@@ -10,6 +11,12 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.ImageView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.BitmapImageViewTarget
+import com.bumptech.glide.request.target.CustomViewTarget
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
+import java.io.File
 
 /**
  * CropView
@@ -191,7 +198,8 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     override fun setUri(uri: Uri, scale: ScaleXY, offsetX: Float, offsetY: Float) {
         val image = findViewById<ImageView>(R.id.cropme_image_view)
-        image.setImageURI(uri)
+        Glide.with(context)
+                .load(uri).into(image)
         image.requestLayout()
         image.postDelayed({
             scaleAnimator?.scaleTo(scale.x)
