@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.takusemba.cropme.CropInfo;
 import com.takusemba.cropme.CropView;
 import com.takusemba.cropme.OnCropChangeListener;
 import com.takusemba.cropme.OnCropListener;
@@ -65,12 +66,12 @@ public class CropActivity extends AppCompatActivity {
             }
         };
 
-//        cropView.setOnCropChangeListener(new OnCropChangeListener() {
-//            @Override
-//            public void onCropChange(Uri uri, ScaleXY scaleXY, PointF point) {
-//                System.out.println(">>>> " + uri + "," + scaleXY + "," + point);
-//            }
-//        });
+        cropView.setOnCropChangeListener(new OnCropChangeListener() {
+            @Override
+            public void onCropChange(Uri uri, CropInfo cropInfo) {
+                System.out.println(">>>> " + uri + "," + cropInfo.getScaleXY() + "," + cropInfo.getPoint());
+            }
+        });
 
         adapter = new AlbumAdapter(CropActivity.this, new ArrayList<Album>(), listener);
 

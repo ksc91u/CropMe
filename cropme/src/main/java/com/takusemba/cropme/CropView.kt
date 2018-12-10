@@ -104,14 +104,22 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             override fun onScaled(scale: Float) {
                 this@CropView.scale = scaleAnimator!!.scale(scale)
                 uri?.let{
-                    onCropChangeListener?.onCropChange(it, this@CropView.scale, this@CropView.point)
+                    val target = findViewById<CropImageView>(R.id.cropme_image_view)
+                    val targetRect = Rect()
+                    target.getHitRect(targetRect)
+
+                    onCropChangeListener?.onCropChange(it, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
                 }
             }
 
             override fun onScaleEnded() {
                 this@CropView.scale = scaleAnimator!!.reScaleIfNeeded()
                 uri?.let{
-                    onCropChangeListener?.onCropChange(it, this@CropView.scale, this@CropView.point)
+                    val target = findViewById<CropImageView>(R.id.cropme_image_view)
+                    val targetRect = Rect()
+                    target.getHitRect(targetRect)
+
+                    onCropChangeListener?.onCropChange(it, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
                 }
             }
 
@@ -121,7 +129,11 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
                 this@CropView.point = PointF(x, y)
                 uri?.let{
-                    onCropChangeListener?.onCropChange(it, this@CropView.scale, this@CropView.point)
+                    val target = findViewById<CropImageView>(R.id.cropme_image_view)
+                    val targetRect = Rect()
+                    target.getHitRect(targetRect)
+
+                    onCropChangeListener?.onCropChange(it, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
                 }
 
             }
@@ -143,7 +155,11 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 }
 
                 uri?.let{
-                    onCropChangeListener?.onCropChange(it, this@CropView.scale, this@CropView.point)
+                    val target = findViewById<CropImageView>(R.id.cropme_image_view)
+                    val targetRect = Rect()
+                    target.getHitRect(targetRect)
+
+                    onCropChangeListener?.onCropChange(it, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
                 }
             }
         })
