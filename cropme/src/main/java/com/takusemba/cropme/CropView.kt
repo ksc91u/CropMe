@@ -194,6 +194,12 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     override fun setUri(uri: Uri) {
         setUri(uri, ScaleXY(1.0f, 1.0f), 0.0f, 0.0f)
+
+        val target = findViewById<CropImageView>(R.id.cropme_image_view)
+        val targetRect = Rect()
+        target.getHitRect(targetRect)
+
+        onCropChangeListener?.onCropChange(uri, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
     }
 
     override fun setUri(uri: Uri, scale: ScaleXY, offsetX: Float, offsetY: Float) {
