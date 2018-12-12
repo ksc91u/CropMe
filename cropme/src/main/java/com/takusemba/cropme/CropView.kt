@@ -1,9 +1,11 @@
 package com.takusemba.cropme
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.PointF
+import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.AttributeSet
 import android.view.Gravity
@@ -12,11 +14,6 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.BitmapImageViewTarget
-import com.bumptech.glide.request.target.CustomViewTarget
-import com.bumptech.glide.request.target.SimpleTarget
-import com.bumptech.glide.request.transition.Transition
-import java.io.File
 
 /**
  * CropView
@@ -41,7 +38,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     private var uri: Uri? = null
     private var scale: ScaleXY? = null
-    private var point:PointF? = null
+    private var point: PointF? = null
 
     var onCropChangeListener: OnCropChangeListener? = null
 
@@ -110,7 +107,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
             override fun onScaled(scale: Float) {
                 this@CropView.scale = scaleAnimator!!.scale(scale)
-                uri?.let{
+                uri?.let {
                     val target = findViewById<CropImageView>(R.id.cropme_image_view)
                     val targetRect = Rect()
                     target.getHitRect(targetRect)
@@ -121,7 +118,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
             override fun onScaleEnded() {
                 this@CropView.scale = scaleAnimator!!.reScaleIfNeeded()
-                uri?.let{
+                uri?.let {
                     val target = findViewById<CropImageView>(R.id.cropme_image_view)
                     val targetRect = Rect()
                     target.getHitRect(targetRect)
@@ -135,7 +132,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 val y = verticalAnimator!!.move(dy)
 
                 this@CropView.point = PointF(x, y)
-                uri?.let{
+                uri?.let {
                     val target = findViewById<CropImageView>(R.id.cropme_image_view)
                     val targetRect = Rect()
                     target.getHitRect(targetRect)
@@ -153,15 +150,15 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             override fun onMoveEnded() {
                 if (horizontalAnimator!!.isNotFlinging) {
                     val x = horizontalAnimator!!.reMoveIfNeeded(0f)
-                    this@CropView.point = PointF(x, this@CropView.point?.y?:0f)
+                    this@CropView.point = PointF(x, this@CropView.point?.y ?: 0f)
                 }
 
                 if (verticalAnimator!!.isNotFlinging) {
                     val y = verticalAnimator!!.reMoveIfNeeded(0f)
-                    this@CropView.point = PointF(this@CropView.point?.x?:0f, y)
+                    this@CropView.point = PointF(this@CropView.point?.x ?: 0f, y)
                 }
 
-                uri?.let{
+                uri?.let {
                     val target = findViewById<CropImageView>(R.id.cropme_image_view)
                     val targetRect = Rect()
                     target.getHitRect(targetRect)
@@ -193,7 +190,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     override fun setUri(uri: Uri) {
-        setUri(uri, ScaleXY(1.0f, 1.0f), 0.0f, 0.0f)
+        setUri(uri, null, null, null)
 
         val target = findViewById<CropImageView>(R.id.cropme_image_view)
         val targetRect = Rect()
@@ -202,16 +199,18 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         onCropChangeListener?.onCropChange(uri, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
     }
 
-    override fun setUri(uri: Uri, scale: ScaleXY, offsetX: Float, offsetY: Float) {
+    override fun setUri(uri: Uri, scale: ScaleXY?, offsetX: Float?, offsetY: Float?) {
         val image = findViewById<ImageView>(R.id.cropme_image_view)
         Glide.with(context)
                 .load(uri).into(image)
         image.requestLayout()
-        image.postDelayed({
-            scaleAnimator?.scaleTo(scale.x)
-            horizontalAnimator?.moveTo(offsetX)
-            verticalAnimator?.moveTo(offsetY)
-        }, 100)
+        if (scale != null && offsetX != null && offsetY != null) {
+            image.postDelayed({
+                scaleAnimator?.scaleTo(scale.x)
+                horizontalAnimator?.moveTo(offsetX)
+                verticalAnimator?.moveTo(offsetY)
+            }, 100)
+        }
         this.uri = uri
     }
 
