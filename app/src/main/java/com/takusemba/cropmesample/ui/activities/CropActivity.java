@@ -62,7 +62,7 @@ public class CropActivity extends AppCompatActivity {
         OnPhotoClickListener listener = new OnPhotoClickListener() {
             @Override
             public void onPhotoClicked(Photo photo) {
-                cropView.setUri(photo.uri, new ScaleXY(2.0f, 2.0f), 300.0f, 300.0f);
+                cropView.setUri(photo.uri);
             }
         };
 
@@ -170,7 +170,7 @@ public class CropActivity extends AppCompatActivity {
                             if (!album.photos.isEmpty()) {
                                 if (adapter.getItemCount() == 0) {
                                     Photo photo = album.photos.get(0);
-                                    cropView.setUri(photo.uri, new ScaleXY(1.0f, 1.0f), 0f, 0f);
+                                    cropView.setUri(photo.uri);
                                 }
                                 adapter.addItem(album);
                             }

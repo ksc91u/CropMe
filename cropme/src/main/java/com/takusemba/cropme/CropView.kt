@@ -14,6 +14,10 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.PublishSubject
+import java.util.concurrent.TimeUnit
 
 /**
  * CropView
@@ -41,6 +45,9 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     private var point: PointF? = null
 
     var onCropChangeListener: OnCropChangeListener? = null
+
+    var cropChangeSubject: PublishSubject<Rect> = PublishSubject.create()
+    var disposable: CompositeDisposable = CompositeDisposable()
 
     init {
         val a = getContext().obtainStyledAttributes(attrs, R.styleable.CropView)
@@ -72,10 +79,21 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         init()
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        disposable.dispose()
+    }
+
     private fun init() {
 
         startActionDetector()
         addLayouts()
+
+        cropChangeSubject.throttleLast(200, TimeUnit.MILLISECONDS).subscribe {rect ->
+            this@CropView.uri?.let{
+                onCropChangeListener?.onCropChange(it, CropInfo(this@CropView.scale, this@CropView.point, rect, restriction))
+            }
+        }.addTo(disposable)
 
         viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
@@ -100,6 +118,14 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 return true
             }
         })
+        val target = findViewById<CropImageView>(R.id.cropme_image_view)
+        viewTreeObserver.addOnDrawListener {
+
+            val targetRect = Rect()
+            target.getHitRect(targetRect)
+
+            cropChangeSubject.onNext(targetRect)
+        }
     }
 
     private fun startActionDetector() {
@@ -111,8 +137,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     val target = findViewById<CropImageView>(R.id.cropme_image_view)
                     val targetRect = Rect()
                     target.getHitRect(targetRect)
-
-                    onCropChangeListener?.onCropChange(it, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
+                    cropChangeSubject.onNext(targetRect)
                 }
             }
 
@@ -122,8 +147,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     val target = findViewById<CropImageView>(R.id.cropme_image_view)
                     val targetRect = Rect()
                     target.getHitRect(targetRect)
-
-                    onCropChangeListener?.onCropChange(it, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
+                    cropChangeSubject.onNext(targetRect)
                 }
             }
 
@@ -136,8 +160,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     val target = findViewById<CropImageView>(R.id.cropme_image_view)
                     val targetRect = Rect()
                     target.getHitRect(targetRect)
-
-                    onCropChangeListener?.onCropChange(it, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
+                    cropChangeSubject.onNext(targetRect)
                 }
 
             }
@@ -162,8 +185,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     val target = findViewById<CropImageView>(R.id.cropme_image_view)
                     val targetRect = Rect()
                     target.getHitRect(targetRect)
-
-                    onCropChangeListener?.onCropChange(it, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
+                    cropChangeSubject.onNext(targetRect)
                 }
             }
         })
@@ -191,12 +213,6 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     override fun setUri(uri: Uri) {
         setUri(uri, null, null, null)
-
-        val target = findViewById<CropImageView>(R.id.cropme_image_view)
-        val targetRect = Rect()
-        target.getHitRect(targetRect)
-
-        onCropChangeListener?.onCropChange(uri, CropInfo(this@CropView.scale, this@CropView.point, targetRect, restriction))
     }
 
     override fun setUri(uri: Uri, scale: ScaleXY?, offsetX: Float?, offsetY: Float?) {
