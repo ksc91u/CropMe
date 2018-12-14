@@ -91,7 +91,9 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
         cropChangeSubject.throttleLast(200, TimeUnit.MILLISECONDS).subscribe {rect ->
             this@CropView.uri?.let{
-                onCropChangeListener?.onCropChange(it, CropInfo(this@CropView.scale, this@CropView.point, rect, restriction))
+                val scale = if(this@CropView.scale == null) ScaleXY(1.0f, 1.0f) else ScaleXY(this@CropView.scale!!.x, this@CropView.scale!!.y)
+                val point = if(this@CropView.point == null) null else PointF(this@CropView.point!!.x, this@CropView.point!!.y)
+                onCropChangeListener?.onCropChange(it, CropInfo(scale, point, rect, restriction))
             }
         }.addTo(disposable)
 
@@ -225,6 +227,13 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 scaleAnimator?.scaleTo(scale.x)
                 horizontalAnimator?.moveTo(offsetX)
                 verticalAnimator?.moveTo(offsetY)
+            }, 100)
+        }else{
+            image.postDelayed({
+                image.scaleX = 1.0f
+                image.scaleY = 1.0f
+                image.translationX = 0f
+                image.translationY = 0f
             }, 100)
         }
         this.uri = uri
