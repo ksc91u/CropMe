@@ -219,6 +219,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     override fun setUri(uri: Uri, scale: ScaleXY?, offsetX: Float?, offsetY: Float?) {
         val image = findViewById<ImageView>(R.id.cropme_image_view)
+        this.uri = uri
         Glide.with(context)
                 .load(uri).into(image)
         image.requestLayout()
@@ -236,7 +237,6 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 image.translationY = 0f
             }, 100)
         }
-        this.uri = uri
     }
 
     override fun setBitmap(bitmap: Bitmap) {
