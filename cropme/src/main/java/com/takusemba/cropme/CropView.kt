@@ -214,10 +214,14 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         image.requestLayout()
         if (scale != null && offsetX != null && offsetY != null) {
             image.postDelayed({
-                scaleAnimator?.scaleTo(scale.x)
-                horizontalAnimator?.moveTo(offsetX)
-                verticalAnimator?.moveTo(offsetY)
+                image.scaleX = scale.x
+                image.scaleY = scale.x
+                image.translationY = offsetY
+                image.translationX = offsetX
             }, 100)
+            this.scale = ScaleXY(scale.x, scale.y)
+            this.point = PointF(offsetX, offsetY)
+            updateCropInfo()
         } else {
             image.postDelayed({
                 image.scaleX = 1.0f
