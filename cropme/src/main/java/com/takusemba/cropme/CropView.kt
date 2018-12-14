@@ -46,7 +46,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     var onCropChangeListener: OnCropChangeListener? = null
 
-    var cropChangeSubject: PublishSubject<Rect> = PublishSubject.create()
+    var cropChangeSubject: PublishSubject<Pair<Uri, CropInfo>> = PublishSubject.create()
     var disposable: CompositeDisposable = CompositeDisposable()
 
     init {
@@ -89,12 +89,8 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         startActionDetector()
         addLayouts()
 
-        cropChangeSubject.throttleLast(200, TimeUnit.MILLISECONDS).subscribe {rect ->
-            this@CropView.uri?.let{
-                val scale = if(this@CropView.scale == null) ScaleXY(1.0f, 1.0f) else ScaleXY(this@CropView.scale!!.x, this@CropView.scale!!.y)
-                val point = if(this@CropView.point == null) null else PointF(this@CropView.point!!.x, this@CropView.point!!.y)
-                onCropChangeListener?.onCropChange(it, CropInfo(scale, point, rect, restriction))
-            }
+        cropChangeSubject.throttleLast(100, TimeUnit.MILLISECONDS).subscribe { pair ->
+            onCropChangeListener?.onCropChange(pair.first, pair.second)
         }.addTo(disposable)
 
         viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
@@ -126,7 +122,7 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             val targetRect = Rect()
             target.getHitRect(targetRect)
 
-            cropChangeSubject.onNext(targetRect)
+            updateCropInfo()
         }
     }
 
@@ -135,22 +131,11 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
             override fun onScaled(scale: Float) {
                 this@CropView.scale = scaleAnimator!!.scale(scale)
-                uri?.let {
-                    val target = findViewById<CropImageView>(R.id.cropme_image_view)
-                    val targetRect = Rect()
-                    target.getHitRect(targetRect)
-                    cropChangeSubject.onNext(targetRect)
-                }
             }
 
             override fun onScaleEnded() {
                 this@CropView.scale = scaleAnimator!!.reScaleIfNeeded()
-                uri?.let {
-                    val target = findViewById<CropImageView>(R.id.cropme_image_view)
-                    val targetRect = Rect()
-                    target.getHitRect(targetRect)
-                    cropChangeSubject.onNext(targetRect)
-                }
+                updateCropInfo()
             }
 
             override fun onMoved(dx: Float, dy: Float) {
@@ -158,13 +143,6 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 val y = verticalAnimator!!.move(dy)
 
                 this@CropView.point = PointF(x, y)
-                uri?.let {
-                    val target = findViewById<CropImageView>(R.id.cropme_image_view)
-                    val targetRect = Rect()
-                    target.getHitRect(targetRect)
-                    cropChangeSubject.onNext(targetRect)
-                }
-
             }
 
             override fun onFlinged(velocityX: Float, velocityY: Float) {
@@ -183,18 +161,29 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     this@CropView.point = PointF(this@CropView.point?.x ?: 0f, y)
                 }
 
-                uri?.let {
-                    val target = findViewById<CropImageView>(R.id.cropme_image_view)
-                    val targetRect = Rect()
-                    target.getHitRect(targetRect)
-                    cropChangeSubject.onNext(targetRect)
-                }
+                updateCropInfo()
             }
         })
         setOnTouchListener { v, event ->
             actionDetector!!.detectAction(event)
             true
         }
+    }
+
+    private fun updateCropInfo(){
+        uri?.let {
+            cropChangeSubject.onNext(Pair(it, this@CropView.cropInfo()))
+        }
+    }
+
+    private fun cropInfo(): CropInfo {
+        val target = findViewById<CropImageView>(R.id.cropme_image_view)
+        val targetRect = Rect()
+        target.getHitRect(targetRect)
+
+        val scale = if (this@CropView.scale == null) ScaleXY(1.0f, 1.0f) else ScaleXY(this@CropView.scale!!.x, this@CropView.scale!!.y)
+        val point = if (this@CropView.point == null) null else PointF(this@CropView.point!!.x, this@CropView.point!!.y)
+        return CropInfo(scale, point, targetRect, restriction)
     }
 
     private fun addLayouts() {
@@ -229,13 +218,16 @@ class CropView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 horizontalAnimator?.moveTo(offsetX)
                 verticalAnimator?.moveTo(offsetY)
             }, 100)
-        }else{
+        } else {
             image.postDelayed({
                 image.scaleX = 1.0f
                 image.scaleY = 1.0f
                 image.translationX = 0f
                 image.translationY = 0f
             }, 100)
+            this.scale = ScaleXY(1.0f, 1.0f)
+            this.point = PointF(0f, 0f)
+            updateCropInfo()
         }
     }
 
