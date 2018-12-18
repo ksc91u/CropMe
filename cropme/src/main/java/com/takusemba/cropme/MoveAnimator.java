@@ -13,7 +13,7 @@ interface MoveAnimator {
     /**
      * stiffness when flinging or bouncing
      **/
-    float STIFFNESS = SpringForce.STIFFNESS_VERY_LOW;
+    float STIFFNESS = SpringForce.STIFFNESS_HIGH;
 
     /**
      * dumping ratio when flinging or bouncing
